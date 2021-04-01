@@ -6,23 +6,32 @@
 //  Copyright © 2021 App Brewery. All rights reserved.
 //
 
-import Foundation
+
+import CoreLocation
 
 protocol WeatherManagerDelegate {
-    func  didUpdateWeather(_ weather:WeatherModel)
+    func  didUpdateWeather(_ weatherManager: WeatherManager, _ weather:WeatherModel)
     func  didFailWithError(_ error : Error)
 }
 
-struct WeatherManager {
-
+struct WeatherManager{
     
-    func fetchWeather(_ cityName : String){
-        let weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=\(cityName)&appid=02ad8dd66fd8ee617c9bdac5c786989f&units=metric"
-        performRequest(weatherURL)
-    }
+    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=02ad8dd66fd8ee617c9bdac5c786989f&units=metric"
     
     var delegate : WeatherManagerDelegate?
-        
+    
+    func fetchWeather(_ cityName : String){
+        let urlString = "\(weatherURL)&q=\(cityName)"
+        performRequest(urlString)
+    }
+    
+    func fetchWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        let urlString = "\(weatherURL)&lat=\(latitude)&lon=\(longitude)"
+        performRequest(urlString)
+    }
+    
+    
+    
     func performRequest(_ urlString: String) {
         //1. Create URL
         if let url = URL(string: urlString){
@@ -43,7 +52,7 @@ struct WeatherManager {
         if let safeData = data {
             if let weather = parseJSON(safeData) {
                 //let weatherVC = WeatherViewController()
-                self.delegate?.didUpdateWeather(weather)
+                self.delegate?.didUpdateWeather(self,weather)
             }
         }
     }
@@ -60,26 +69,26 @@ struct WeatherManager {
         }
     }
     
-//    func getConditionName(weatherID : Int) -> String {
-//
-//        switch weatherID {
-//        case 200...232:
-//            return "cloud.bolt"
-//        case 300...321:
-//            return "cloud.drizzle"
-//        case 500...531:
-//            return "cloud.rain"
-//        case 600...622:
-//            return "cloud.snow"
-//        case 701...781:
-//            return "cloud.fog"
-//        case 800:
-//            return "sun.max"
-//        case 801...804:
-//            return "cloud.bolt"
-//
-//        default:
-//            return "cloud"
-//        }
-    }
+    //    func getConditionName(weatherID : Int) -> String {
+    //
+    //        switch weatherID {
+    //        case 200...232:
+    //            return "cloud.bolt"
+    //        case 300...321:
+    //            return "cloud.drizzle"
+    //        case 500...531:
+    //            return "cloud.rain"
+    //        case 600...622:
+    //            return "cloud.snow"
+    //        case 701...781:
+    //            return "cloud.fog"
+    //        case 800:
+    //            return "sun.max"
+    //        case 801...804:
+    //            return "cloud.bolt"
+    //
+    //        default:
+    //            return "cloud"
+    //        }
+}
 
